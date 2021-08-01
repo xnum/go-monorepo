@@ -1,0 +1,6 @@
+[submodule "protos"]
+	path = protos
+	url = ../../Stranity/Proto.git
+[submodule "third_party/errors"]
+	path = third_party/errors
+	url = https://github.com/pkg/errors.git

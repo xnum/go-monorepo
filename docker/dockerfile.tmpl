@@ -1,0 +1,10 @@
+FROM alpine:latest
+
+RUN apk add --update ca-certificates sqlite tzdata curl jq && \
+    rm -rf /var/cache/apk/* && \
+    cp /usr/share/zoneinfo/Asia/Taipei /etc/localtime && \
+    echo "Asia/Taipei" > /etc/timezone
+
+COPY build/{{ .Binary }} /usr/local/bin/{{ .Binary }}
+
+CMD /usr/local/bin/{{ .Binary }}
