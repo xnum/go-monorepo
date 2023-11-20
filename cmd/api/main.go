@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 
-	"go-monorepo/app"
+	"github.com/sky-mirror/boot"
+	"github.com/urfave/cli/v2"
+
 	"go-monorepo/app/api"
 	"go-monorepo/health"
-
-	"github.com/urfave/cli/v2"
 )
 
 // Main starts process in cli.
@@ -19,7 +19,7 @@ func Main(ctx context.Context, c *cli.Context) {
 }
 
 func main() {
-	app := app.App{
+	app := boot.App{
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "listen-addr",

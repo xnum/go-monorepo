@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"go-monorepo/logging"
-
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"go-monorepo/logging"
 )
 
 const (
@@ -24,7 +24,7 @@ var tmpInfo struct {
 	sync.Mutex
 	alive bool
 	ready bool
-	vars  map[string]interface{}
+	vars  map[string]any
 }
 
 // StartCollector starts collector.
@@ -33,10 +33,10 @@ func StartCollector() {
 		var (
 			alive = true
 			ready = true
-			vars  = make(map[string]interface{})
+			vars  = make(map[string]any)
 		)
 
-		infos.Range(func(key, value interface{}) bool {
+		infos.Range(func(key, value any) bool {
 			info := value.(Info)
 
 			age := time.Since(info.lastTime)
@@ -81,7 +81,7 @@ func StartCollector() {
 	}
 }
 
-func gatherInfos() (alive, ready bool, vars map[string]interface{}) {
+func gatherInfos() (alive, ready bool, vars map[string]any) {
 	tmpInfo.Lock()
 	defer tmpInfo.Unlock()
 

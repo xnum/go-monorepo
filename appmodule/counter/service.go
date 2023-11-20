@@ -6,10 +6,10 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"go-monorepo/cache"
 	"go-monorepo/health"
-
-	"github.com/pkg/errors"
 )
 
 // Service makes meaningless counter and let clients to query the number.
@@ -27,7 +27,11 @@ func (s *Service) Start(ctx context.Context) {
 		}()
 
 		// create tracker to track this goroutine's healthy.
-		info := health.NewInfo("naive-count-worker", 10*time.Second, health.ProbeReady)
+		info := health.NewInfo(
+			"naive-count-worker",
+			10*time.Second,
+			health.ProbeReady,
+		)
 
 		// report this goroutine is exited and handles panic.
 		defer info.Down()
@@ -56,7 +60,7 @@ func (s *Service) Start(ctx context.Context) {
 	}()
 }
 
-//Query returns the number.
+// Query returns the number.
 func (s *Service) Query() int64 {
 	return atomic.LoadInt64(&s.count)
 }

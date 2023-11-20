@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-//TCPPool pool info
+// TCPPool pool info
 type TCPPool struct {
 	Mu          sync.Mutex
 	IdleTimeout time.Duration
@@ -20,7 +20,7 @@ type tcpIdleConn struct {
 	t    time.Time
 }
 
-//Get get from pool
+// Get get from pool
 func (c *TCPPool) Get() (net.Conn, error) {
 	c.Mu.Lock()
 	conns := c.conns
@@ -55,7 +55,7 @@ func (c *TCPPool) Get() (net.Conn, error) {
 	}
 }
 
-//Put put back to pool
+// Put put back to pool
 func (c *TCPPool) Put(conn net.Conn) error {
 	if conn == nil {
 		return errRejected
@@ -77,7 +77,7 @@ func (c *TCPPool) Put(conn net.Conn) error {
 	}
 }
 
-//Close close all connection
+// Close close all connection
 func (c *TCPPool) Close() {
 	c.Mu.Lock()
 	conns := c.conns
@@ -97,7 +97,7 @@ func (c *TCPPool) Close() {
 	}
 }
 
-//IdleCount idle connection count
+// IdleCount idle connection count
 func (c *TCPPool) IdleCount() int {
 	c.Mu.Lock()
 	conns := c.conns
@@ -105,7 +105,7 @@ func (c *TCPPool) IdleCount() int {
 	return len(conns)
 }
 
-//NewTCPPool init tcp pool
+// NewTCPPool init tcp pool
 func NewTCPPool(o *Options) (*TCPPool, error) {
 	if err := o.validate(); err != nil {
 		return nil, err

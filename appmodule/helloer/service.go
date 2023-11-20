@@ -1,13 +1,13 @@
 package helloer
 
 import (
-	"go-monorepo/env"
-	"go-monorepo/logging"
-
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"gorm.io/gorm"
+
+	"go-monorepo/env"
+	"go-monorepo/logging"
 )
 
 var myName = env.String(env.PodName)
@@ -43,8 +43,6 @@ func (s *Service) logResponse(typ, name, resp string) {
 	}).Error; err != nil {
 		logging.Get().Error(err)
 	}
-
-	return
 }
 
 // SayHello generates response.
@@ -54,7 +52,8 @@ func (s *Service) SayHello(name string) (resp string, err error) {
 	}()
 
 	if s.reqCounterVec != nil {
-		s.reqCounterVec.With(prometheus.Labels{"request_type": "SayHello"}).Inc()
+		s.reqCounterVec.With(prometheus.Labels{"request_type": "SayHello"}).
+			Inc()
 	}
 
 	switch name {

@@ -5,13 +5,13 @@ import (
 	"log"
 	"net"
 
-	"go-monorepo/app"
+	"github.com/sky-mirror/boot"
+	"github.com/urfave/cli/v2"
+	"google.golang.org/grpc"
+
 	"go-monorepo/app/hellod"
 	"go-monorepo/health"
 	"go-monorepo/internal/rpc/hello"
-
-	"github.com/urfave/cli/v2"
-	"google.golang.org/grpc"
 )
 
 // Main starts process in cli.
@@ -34,7 +34,7 @@ func Main(ctx context.Context, c *cli.Context) {
 }
 
 func main() {
-	app := app.App{
+	app := boot.App{
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "listen-addr",

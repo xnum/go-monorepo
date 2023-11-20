@@ -1,3 +1,4 @@
+//go:build tools
 // +build tools
 
 // This file is not intended to be compiled.  Because some of these imports are

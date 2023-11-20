@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-//RPCPool pool info
+// RPCPool pool info
 type RPCPool struct {
 	Mu          sync.Mutex
 	IdleTimeout time.Duration
@@ -25,7 +25,7 @@ type rpcIdleConn struct {
 	t    time.Time
 }
 
-//Get get from pool
+// Get get from pool
 func (c *RPCPool) Get() (*rpc.Client, error) {
 	c.Mu.Lock()
 	conns := c.conns
@@ -60,7 +60,7 @@ func (c *RPCPool) Get() (*rpc.Client, error) {
 	}
 }
 
-//Put put back to pool
+// Put put back to pool
 func (c *RPCPool) Put(conn *rpc.Client) error {
 	if conn == nil {
 		return errRejected
@@ -82,7 +82,7 @@ func (c *RPCPool) Put(conn *rpc.Client) error {
 	}
 }
 
-//Close close all connection
+// Close close all connection
 func (c *RPCPool) Close() {
 	c.Mu.Lock()
 	conns := c.conns
@@ -102,7 +102,7 @@ func (c *RPCPool) Close() {
 	}
 }
 
-//IdleCount idle connection count
+// IdleCount idle connection count
 func (c *RPCPool) IdleCount() int {
 	c.Mu.Lock()
 	conns := c.conns
@@ -110,7 +110,7 @@ func (c *RPCPool) IdleCount() int {
 	return len(conns)
 }
 
-//Codec ...
+// Codec ...
 type Codec struct {
 	Timeout time.Duration
 	Closer  io.ReadWriteCloser
@@ -119,7 +119,7 @@ type Codec struct {
 	EncBuf  *bufio.Writer
 }
 
-//WriteRequest ...
+// WriteRequest ...
 func (c *Codec) WriteRequest(r *rpc.Request, body interface{}) (err error) {
 	if err = c.timeoutCoder(r, "write request"); err != nil {
 		return
@@ -132,17 +132,17 @@ func (c *Codec) WriteRequest(r *rpc.Request, body interface{}) (err error) {
 	return c.EncBuf.Flush()
 }
 
-//ReadResponseHeader ...
+// ReadResponseHeader ...
 func (c *Codec) ReadResponseHeader(r *rpc.Response) error {
 	return c.Decoder.Decode(r)
 }
 
-//ReadResponseBody ...
+// ReadResponseBody ...
 func (c *Codec) ReadResponseBody(body interface{}) error {
 	return c.Decoder.Decode(body)
 }
 
-//Close ...
+// Close ...
 func (c *Codec) Close() error {
 	return c.Closer.Close()
 }
@@ -163,7 +163,7 @@ func (c *Codec) timeoutCoder(e interface{}, msg string) error {
 	}
 }
 
-//NewRPCPool init rpc pool
+// NewRPCPool init rpc pool
 func NewRPCPool(o *Options) (*RPCPool, error) {
 	if err := o.validate(); err != nil {
 		return nil, err

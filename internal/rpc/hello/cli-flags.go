@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sky-mirror/boot"
 	"github.com/urfave/cli/v2"
 
-	"go-monorepo/cliflag"
 	"go-monorepo/pkg/pool"
 )
 
@@ -27,7 +27,7 @@ func NewClientConfig(prefix string) *ClientConfig {
 	}
 
 	cfg := &ClientConfig{prefix: prefix}
-	cliflag.Register(cfg)
+	boot.Register(cfg)
 
 	cfg.poolConfig = pool.NewConfig(prefix + "hello")
 	return cfg

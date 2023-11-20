@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-//GRPCPool pool info
+// GRPCPool pool info
 type GRPCPool struct {
 	Mu          sync.Mutex
 	IdleTimeout time.Duration
@@ -23,7 +23,7 @@ type grpcIdleConn struct {
 	t    time.Time
 }
 
-//Get get from pool
+// Get get from pool
 func (c *GRPCPool) Get() (*grpc.ClientConn, error) {
 	c.Mu.Lock()
 	conns := c.conns
@@ -58,7 +58,7 @@ func (c *GRPCPool) Get() (*grpc.ClientConn, error) {
 	}
 }
 
-//Put put back to pool
+// Put put back to pool
 func (c *GRPCPool) Put(conn *grpc.ClientConn) error {
 	if conn == nil {
 		return errRejected
@@ -80,7 +80,7 @@ func (c *GRPCPool) Put(conn *grpc.ClientConn) error {
 	}
 }
 
-//Close close pool
+// Close close pool
 func (c *GRPCPool) Close() {
 	c.Mu.Lock()
 	conns := c.conns
@@ -100,7 +100,7 @@ func (c *GRPCPool) Close() {
 	}
 }
 
-//IdleCount idle connection count
+// IdleCount idle connection count
 func (c *GRPCPool) IdleCount() int {
 	c.Mu.Lock()
 	conns := c.conns
@@ -108,7 +108,7 @@ func (c *GRPCPool) IdleCount() int {
 	return len(conns)
 }
 
-//NewGRPCPool init grpc pool
+// NewGRPCPool init grpc pool
 func NewGRPCPool(o *Options, dialOptions ...grpc.DialOption) *GRPCPool {
 	if err := o.validate(); err != nil {
 		log.Panicln(err)
@@ -120,7 +120,10 @@ func NewGRPCPool(o *Options, dialOptions ...grpc.DialOption) *GRPCPool {
 		factory: func() (*grpc.ClientConn, error) {
 			target := o.nextTarget()
 
-			ctx, cancel := context.WithTimeout(context.Background(), o.DialTimeout)
+			ctx, cancel := context.WithTimeout(
+				context.Background(),
+				o.DialTimeout,
+			)
 			defer cancel()
 
 			return grpc.DialContext(ctx, target, dialOptions...)

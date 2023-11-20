@@ -1,9 +1,8 @@
 package health
 
 import (
+	"github.com/sky-mirror/boot"
 	"github.com/urfave/cli/v2"
-
-	"go-monorepo/cliflag"
 )
 
 type config struct {
@@ -13,7 +12,7 @@ type config struct {
 var defaultConfig config
 
 func init() {
-	cliflag.Register(&defaultConfig)
+	boot.Register(&defaultConfig)
 }
 
 // CliFlags returns cli flags to setup cache package.

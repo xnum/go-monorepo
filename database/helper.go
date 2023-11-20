@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"go-monorepo/cliflag"
-
+	"github.com/sky-mirror/boot"
 	"github.com/urfave/cli/v2"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -17,11 +16,11 @@ import (
 var defaultOption ConnectOption
 
 func init() {
-	cliflag.Register(&defaultOption)
+	boot.Register(&defaultOption)
 }
 
-var _ cliflag.Beforer = &ConnectOption{}
-var _ cliflag.Afterer = &ConnectOption{}
+var _ boot.Beforer = &ConnectOption{}
+var _ boot.Afterer = &ConnectOption{}
 
 // ConnectOption defines a generic connect option for all dialects.
 type ConnectOption struct {
@@ -51,8 +50,14 @@ func (opt *ConnectOption) ConnStr() string {
 			"dbname=%v password=%v sslmode=disable",
 			opt.Host, opt.Port, opt.User, opt.DBName, opt.Pass)
 	case "mssql":
-		return fmt.Sprintf("server=%v;user id=%v;password=%v;port=%v;database=%v;",
-			opt.Host, opt.User, opt.Pass, opt.Port, opt.DBName)
+		return fmt.Sprintf(
+			"server=%v;user id=%v;password=%v;port=%v;database=%v;",
+			opt.Host,
+			opt.User,
+			opt.Pass,
+			opt.Port,
+			opt.DBName,
+		)
 	default:
 		log.Panicln("bad dialect: " + opt.Dialect)
 	}

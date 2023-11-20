@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"go-monorepo/pkg/fluent"
-
 	"github.com/op/go-logging"
+
+	"go-monorepo/pkg/fluent"
 )
 
 var (
@@ -60,7 +60,7 @@ type fluentBackend struct {
 func (b *fluentBackend) Log(lvl logging.Level, calldepth int,
 	record *logging.Record) error {
 
-	data := map[string]interface{}{}
+	data := map[string]any{}
 	data["level"] = levelToSyslogLevel(record.Level)
 	data["severity"] = levelToLower(record.Level)
 	data["message"] = record.Message()
@@ -85,17 +85,29 @@ func Initialize() {
 
 	if defaultCfg.fluent.enabled {
 		fluentBackend := &fluentBackend{
-			client: fluent.NewClient(defaultCfg.fluent.host, defaultCfg.fluent.port, defaultCfg.fluent.tag),
+			client: fluent.NewClient(
+				defaultCfg.fluent.host,
+				defaultCfg.fluent.port,
+				defaultCfg.fluent.tag,
+			),
 		}
 		backends = append(backends, fluentBackend)
 	}
 
 	if defaultCfg.file.enabled {
 		var err error
-		file, err = os.OpenFile(filepath.Join(defaultCfg.file.dir, defaultCfg.file.name+".log"),
-			os.O_RDWR|os.O_CREATE, 0644)
+		file, err = os.OpenFile(
+			filepath.Join(defaultCfg.file.dir, defaultCfg.file.name+".log"),
+			os.O_RDWR|os.O_CREATE,
+			0644,
+		)
 		if err != nil {
-			log.Panicf("OpenFile((%v,%v), ...): %v", defaultCfg.file.dir, defaultCfg.file.name, err)
+			log.Panicf(
+				"OpenFile((%v,%v), ...): %v",
+				defaultCfg.file.dir,
+				defaultCfg.file.name,
+				err,
+			)
 		}
 
 		filebackend := logging.NewLogBackend(file, "", 0)

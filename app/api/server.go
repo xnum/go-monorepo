@@ -12,7 +12,6 @@ import (
 
 	"go-monorepo/appmodule/counter"
 	"go-monorepo/logging"
-	ginprometheus "go-monorepo/pkg/go-gin-prometheus"
 )
 
 // Server is a HTTP server.
@@ -26,8 +25,21 @@ func (s *Server) RegisterMiddleware(r *gin.Engine) {
 	r.Use(gin.Recovery())
 
 	config := cors.Config{
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowMethods: []string{
+			"GET",
+			"POST",
+			"PUT",
+			"PATCH",
+			"DELETE",
+			"HEAD",
+			"OPTIONS",
+		},
+		AllowHeaders: []string{
+			"Origin",
+			"Content-Length",
+			"Content-Type",
+			"Authorization",
+		},
 		AllowCredentials: false,
 		MaxAge:           12 * time.Hour,
 	}
@@ -53,9 +65,6 @@ func (s *Server) Start(ctx context.Context, apiAddr string) {
 	// setup gin.
 	apiEngine := gin.New()
 	apiEngine.RedirectTrailingSlash = true
-
-	prome := ginprometheus.NewPrometheus("api")
-	prome.Use(apiEngine)
 
 	s.RegisterMiddleware(apiEngine)
 

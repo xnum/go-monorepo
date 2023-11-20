@@ -31,7 +31,7 @@ const (
 type Info struct {
 	// for json marshalling only.
 	Expired   bool
-	Vars      map[string]interface{}
+	Vars      map[string]any
 	Status    Status
 	Age       string
 	ProbeType ProbeType
@@ -56,7 +56,7 @@ func NewInfo(name string, d time.Duration, pt ProbeType) *Info {
 }
 
 // UpdateVars updates info.
-func (i *Info) UpdateVars(vars map[string]interface{}) {
+func (i *Info) UpdateVars(vars map[string]any) {
 	i.lastTime = time.Now()
 	i.Vars = vars
 	infos.Store(i.taskName, *i)

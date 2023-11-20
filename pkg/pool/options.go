@@ -20,7 +20,7 @@ func init() {
 	rand.NewSource(time.Now().UnixNano())
 }
 
-//Options pool options
+// Options pool options
 type Options struct {
 	//InitTargets init targets
 	InitTargets []string
@@ -68,7 +68,7 @@ func (o *Options) validate() error {
 	return nil
 }
 
-//nextTarget next target implement load balance
+// nextTarget next target implement load balance
 func (o *Options) nextTarget() string {
 	tlen := len(o.InitTargets)
 

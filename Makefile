@@ -1,6 +1,7 @@
 BUILD_DIR=build
 CMD_DIR=cmd
 CMDS=$(patsubst $(CMD_DIR)/%,%,$(wildcard $(CMD_DIR)/*))
+LOCAL_MOD_NAME=$(shell go list -m)
 
 .PHONY: fmt check test
 
@@ -8,13 +9,25 @@ all: fmt check test bin
 
 fmt:
 	gofmt -s -w -l .
-	goimports -w $(shell find . -type f -name '*.go' -not -path "./internal/*")
+	@echo 'goimports' && goimports -w -local $(LOCAL_MOD_NAME) $(shell find . -type f -name '*.go' -not -path "./internal/*")
+	gci write -s standard -s default -s "Prefix($(LOCAL_MOD_NAME))" --skip-generated .
+	@files=$$(git diff --diff-filter=AM --name-only HEAD^ | grep '.go$$'); \
+	if [ -n "$$files" ]; then \
+	  echo 'golines' $$files; \
+		golines --ignore-generated -m 80 --reformat-tags --shorten-comments -w $$files; \
+	fi
+	go mod tidy
 
 check:
-	golint -set_exit_status ./... && \
-	go vet -all ./... && \
-	misspell -error */** && \
-	go mod tidy
+	revive -exclude pkg/... -formatter friendly -config tools/revive.toml  ./...
+	find . -name "*.json" | xargs -n 1 -t gojq . >/dev/null
+	go vet -all -printfuncs=unexpectederrorf,paramerrorf,wrapf,warnf,warningf,infof,debugf,errorf,fatalf,panicf,debug,info,warning,error,fatal,panic ./...
+	golangci-lint run
+	misspell -error */**
+	@echo 'staticcheck' && staticcheck $(shell go list ./... | grep -v internal)
+
+vet:
+	./vet.sh
 
 test:
 	go test ./...

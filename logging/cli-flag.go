@@ -5,15 +5,14 @@ import (
 	"os"
 	"path"
 
-	"go-monorepo/cliflag"
-
+	"github.com/sky-mirror/boot"
 	"github.com/urfave/cli/v2"
 )
 
 var defaultCfg config
 
 func init() {
-	cliflag.Register(&defaultCfg)
+	boot.Register(&defaultCfg)
 }
 
 type fileConfig struct {
@@ -34,8 +33,8 @@ type config struct {
 	fluent fluentConfig
 }
 
-var _ cliflag.Beforer = &config{}
-var _ cliflag.Afterer = &config{}
+var _ boot.Beforer = &config{}
+var _ boot.Afterer = &config{}
 
 func (cfg *config) CliFlags() []cli.Flag {
 	var flags []cli.Flag

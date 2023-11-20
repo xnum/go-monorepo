@@ -1,9 +1,8 @@
 package cache
 
 import (
+	"github.com/sky-mirror/boot"
 	"github.com/urfave/cli/v2"
-
-	"go-monorepo/cliflag"
 )
 
 type config struct {
@@ -15,10 +14,10 @@ type config struct {
 
 var defaultConfig config
 
-var _ cliflag.Beforer = &config{}
+var _ boot.Beforer = &config{}
 
 func init() {
-	cliflag.Register(&defaultConfig)
+	boot.Register(&defaultConfig)
 }
 
 // CliFlags returns cli flags to setup cache package.
@@ -55,7 +54,12 @@ func (cfg *config) CliFlags() []cli.Flag {
 // Before inits.
 func (cfg *config) Before(c *cli.Context) error {
 	if len(cfg.MasterName) > 0 {
-		InitializeSentinel(cfg.Addr, cfg.Password, cfg.MasterName, cfg.SentinelPassword)
+		InitializeSentinel(
+			cfg.Addr,
+			cfg.Password,
+			cfg.MasterName,
+			cfg.SentinelPassword,
+		)
 	} else {
 		Initialize(cfg.Addr, cfg.Password)
 	}

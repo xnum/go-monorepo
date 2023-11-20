@@ -60,7 +60,8 @@ func TestingInitialize(typ string, opt ConnectOption) {
 func TestingFinalize() {
 	// store.Lock()
 	// for _, db := range store.dbs {
-	// XXX pq: cannot drop the currently open database if you aren't superusers or owner.
+	// XXX pq: cannot drop the currently open database if you aren't superusers
+	// or owner.
 	// err := db.GetDB().Exec("DROP DATABASE " + db.Opt.DBName).Error
 	// }
 	// store.Unlock()
@@ -72,20 +73,28 @@ func TestingFinalize() {
 func DeleteCreatedEntities(db *gorm.DB) func() {
 	hookName := "cleanupHook"
 
-	models := make([]interface{}, 0)
+	models := make([]any, 0)
 	// Setup the onCreate Hook
-	db.Callback().Create().After("gorm:create").Register(hookName, func(db *gorm.DB) {
-		switch db.Statement.ReflectValue.Kind() {
-		case reflect.Slice, reflect.Array:
-			db.Statement.CurDestIndex = 0
-			for index := 0; index < db.Statement.ReflectValue.Len(); index++ {
-				elem := reflect.Indirect(db.Statement.ReflectValue.Index(index))
-				models = append(models, elem.Addr().Interface())
+	db.Callback().
+		Create().
+		After("gorm:create").
+		Register(hookName, func(db *gorm.DB) {
+			switch db.Statement.ReflectValue.Kind() {
+			case reflect.Slice, reflect.Array:
+				db.Statement.CurDestIndex = 0
+				for index := 0; index < db.Statement.ReflectValue.Len(); index++ {
+					elem := reflect.Indirect(
+						db.Statement.ReflectValue.Index(index),
+					)
+					models = append(models, elem.Addr().Interface())
+				}
+			case reflect.Struct:
+				models = append(
+					models,
+					db.Statement.ReflectValue.Addr().Interface(),
+				)
 			}
-		case reflect.Struct:
-			models = append(models, db.Statement.ReflectValue.Addr().Interface())
-		}
-	})
+		})
 
 	return func() {
 		for _, model := range models {

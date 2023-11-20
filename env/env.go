@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"go-monorepo/cliflag"
-
+	"github.com/sky-mirror/boot"
 	"github.com/urfave/cli/v2"
 )
 
@@ -37,7 +36,7 @@ func (h *Hook) Before(*cli.Context) error {
 func init() {
 	keys = make(map[string]*string)
 
-	cliflag.Register(&Hook{})
+	boot.Register(&Hook{})
 }
 
 // well known keys.

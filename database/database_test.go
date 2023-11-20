@@ -3,11 +3,11 @@ package database_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"go-monorepo/database"
 	"go-monorepo/logging"
 	"go-monorepo/models"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func testDatabase(t *testing.T, opt database.ConnectOption) {

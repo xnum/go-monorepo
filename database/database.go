@@ -71,7 +71,7 @@ func GetDB(typ string) *gorm.DB {
 }
 
 // AutoMigrate migrates table.
-func AutoMigrate(typ string, models []interface{}) {
+func AutoMigrate(typ string, models []any) {
 	store.Lock()
 	defer store.Unlock()
 	if !store.dbs[typ].Opt.Testing {
@@ -88,11 +88,14 @@ func AutoMigrate(typ string, models []interface{}) {
 }
 
 var (
-	defaultLogger = logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logger.Config{
-		SlowThreshold: 180 * time.Millisecond,
-		LogLevel:      logger.Warn,
-		Colorful:      true,
-	})
+	defaultLogger = logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold: 180 * time.Millisecond,
+			LogLevel:      logger.Warn,
+			Colorful:      true,
+		},
+	)
 )
 
 // Open opens database connection.
@@ -103,7 +106,10 @@ func (db *database) Open() {
 
 	dialector := db.Opt.Dialector()
 	if dialector == nil {
-		log.Panicf("gorm driver open dialector fail, connect str: (%v)", db.Opt.ConnStr())
+		log.Panicf(
+			"gorm driver open dialector fail, connect str: (%v)",
+			db.Opt.ConnStr(),
+		)
 	}
 
 	if db.Opt.Silence {

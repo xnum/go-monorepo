@@ -2,6 +2,7 @@ package hellod
 
 import (
 	"context"
+
 	"go-monorepo/appmodule/helloer"
 	"go-monorepo/database"
 	"go-monorepo/internal/rpc/hello"
@@ -24,7 +25,10 @@ func NewServer() *Server {
 }
 
 // SayHello calls service.
-func (s *Server) SayHello(ctx context.Context, req *hello.HelloRequest) (*hello.HelloReply, error) {
+func (s *Server) SayHello(
+	ctx context.Context,
+	req *hello.HelloRequest,
+) (*hello.HelloReply, error) {
 	resp, err := s.service.SayHello(req.Name)
 	if err != nil {
 		return nil, err

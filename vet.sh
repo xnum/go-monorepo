@@ -42,46 +42,44 @@ if [[ "$1" = "-install" ]]; then
     pushd ./test/tools
     # Install the pinned versions as defined in module tools.
     go install \
-      golang.org/x/lint/golint \
-      golang.org/x/tools/cmd/goimports \
-      honnef.co/go/tools/cmd/staticcheck \
-      github.com/client9/misspell/cmd/misspell \
-      google.golang.org/protobuf/cmd/protoc-gen-go \
-      google.golang.org/grpc/cmd/protoc-gen-go-grpc
+      golang.org/x/tools/cmd/goimports@latest
+    go install \
+      github.com/client9/misspell/cmd/misspell@latest
+    go install \
+      github.com/gogo/protobuf/protoc-gen-gogoslick@latest
+    go install \
+      honnef.co/go/tools/cmd/staticcheck@2023.1.6
+    go install \
+      github.com/itchyny/gojq/cmd/gojq@latest
+    go install \
+      github.com/mgechev/revive@v1.3.3
+    go install \
+      github.com/daixiang0/gci@v0.11.1
+    go install \
+      github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3
+    go install \
+      github.com/abice/go-enum@v0.5.6
+    go install \
+      go.uber.org/mock/mockgen@latest
+    go install \
+      github.com/segmentio/golines@latest
     popd
   else
-    # Ye olde `go get` incantation.
-    # Note: this gets the latest version of all tools (vs. the pinned versions
-    # with Go modules).
-    go get -u \
-      golang.org/x/lint/golint \
-      golang.org/x/tools/cmd/goimports \
-      honnef.co/go/tools/cmd/staticcheck \
-      github.com/client9/misspell/cmd/misspell \
-      google.golang.org/protobuf/protoc-gen-go
+    echo "we don't support old go get anymore"
+    exit 1
   fi
   exit 0
 elif [[ "$#" -ne 0 ]]; then
   die "Unknown argument(s): $*"
 fi
 
-# - gofmt, goimports, golint (with exceptions for generated code), go vet.
-gofmt -s -d -l . 2>&1 || exit 1
-goimports -l . 2>&1 | not grep -vE "(_mock|\.pb)\.go"
-golint ./... 2>&1 | not grep -vE "(_mock|\.pb)\.go:"
-go vet -all ./...
 
-misspell -error */**
 
-# - Check that our module is tidy.
-if go help mod >& /dev/null; then
-  go mod tidy && \
+make fmt check &&
     check_status || \
     (git status; git --no-pager diff; exit 1)
-fi
 
-# - Collection of static analysis checks
-#
-staticcheck $(go list ./... | grep -v internal)
+
+set +x
 
 echo SUCCESS

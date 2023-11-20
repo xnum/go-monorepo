@@ -4,8 +4,7 @@ import (
 	"strings"
 	"time"
 
-	"go-monorepo/cliflag"
-
+	"github.com/sky-mirror/boot"
 	"github.com/urfave/cli/v2"
 )
 
@@ -33,7 +32,7 @@ func NewConfig(prefix string) *Config {
 	}
 
 	cfg := &Config{prefix: prefix}
-	cliflag.Register(cfg)
+	boot.Register(cfg)
 	return cfg
 }
 

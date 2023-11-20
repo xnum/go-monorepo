@@ -30,16 +30,16 @@ the cardinality of the request counter's "uri" label, which might be required in
 For instance, if for a "/customer/:name" route you don't want to generate a time series for every
 possible customer name, you could use this function:
 
-func(c *gin.Context) string {
-	url := c.Request.URL.Path
-	for _, p := range c.Params {
-		if p.Key == "name" {
-			url = strings.Replace(url, p.Value, ":name", 1)
-			break
+	func(c *gin.Context) string {
+		url := c.Request.URL.Path
+		for _, p := range c.Params {
+			if p.Key == "name" {
+				url = strings.Replace(url, p.Value, ":name", 1)
+				break
+			}
 		}
+		return url
 	}
-	return url
-}
 
 which would map "/customer/alice" and "/customer/bob" to their template "/customer/:name".
 */
@@ -64,7 +64,8 @@ type Prometheus struct {
 	serviceName string
 }
 
-// PrometheusPushGateway contains the configuration for pushing to a Prometheus pushgateway (optional)
+// PrometheusPushGateway contains the configuration for pushing to a Prometheus
+// pushgateway (optional)
 type PrometheusPushGateway struct {
 
 	// Push interval in seconds
@@ -74,7 +75,8 @@ type PrometheusPushGateway struct {
 	// where JOBNAME can be any string of your choice
 	PushGatewayURL string
 
-	// Local metrics URL where metrics are fetched from, this could be omitted in the future
+	// Local metrics URL where metrics are fetched from, this could be omitted
+	// in the future
 	// if implemented using prometheus common/expfmt instead
 	MetricsURL string
 
@@ -136,9 +138,13 @@ func NewPrometheus(serviceName string) *Prometheus {
 	return p
 }
 
-// SetPushGateway sends metrics to a remote pushgateway exposed on pushGatewayURL
+// SetPushGateway sends metrics to a remote pushgateway exposed on
+// pushGatewayURL
 // every pushInterval. Metrics are fetched from metricsURL
-func (p *Prometheus) SetPushGateway(pushGatewayURL, metricsURL string, pushInterval time.Duration) {
+func (p *Prometheus) SetPushGateway(
+	pushGatewayURL, metricsURL string,
+	pushInterval time.Duration,
+) {
 	p.Ppg.PushGatewayURL = pushGatewayURL
 	p.Ppg.MetricsURL = metricsURL
 	p.Ppg.PushInterval = pushInterval
@@ -150,7 +156,8 @@ func (p *Prometheus) SetPushGatewayJob(j string) {
 	p.Ppg.Job = j
 }
 
-// SetListenAddress for exposing metrics on address. If not set, it will be exposed at the
+// SetListenAddress for exposing metrics on address. If not set, it will be
+// exposed at the
 // same address of the gin engine that is being used
 func (p *Prometheus) SetListenAddress(address string) {
 	p.listenAddress = address
@@ -159,9 +166,13 @@ func (p *Prometheus) SetListenAddress(address string) {
 	}
 }
 
-// SetListenAddressWithRouter for using a separate router to expose metrics. (this keeps things like GET /metrics out of
+// SetListenAddressWithRouter for using a separate router to expose metrics.
+// (this keeps things like GET /metrics out of
 // your content's access log).
-func (p *Prometheus) SetListenAddressWithRouter(listenAddress string, r *gin.Engine) {
+func (p *Prometheus) SetListenAddressWithRouter(
+	listenAddress string,
+	r *gin.Engine,
+) {
 	p.listenAddress = listenAddress
 	if len(p.listenAddress) > 0 {
 		p.router = r
@@ -180,10 +191,17 @@ func (p *Prometheus) SetMetricsPath(e *gin.Engine) {
 }
 
 // SetMetricsPathWithAuth set metrics paths with authentication
-func (p *Prometheus) SetMetricsPathWithAuth(e *gin.Engine, accounts gin.Accounts) {
+func (p *Prometheus) SetMetricsPathWithAuth(
+	e *gin.Engine,
+	accounts gin.Accounts,
+) {
 
 	if p.listenAddress != "" {
-		p.router.GET(p.MetricsPath, gin.BasicAuth(accounts), prometheusHandler())
+		p.router.GET(
+			p.MetricsPath,
+			gin.BasicAuth(accounts),
+			prometheusHandler(),
+		)
 		p.runServer()
 	} else {
 		e.GET(p.MetricsPath, gin.BasicAuth(accounts), prometheusHandler())
@@ -223,7 +241,11 @@ func (p *Prometheus) getPushGatewayURL() string {
 }
 
 func (p *Prometheus) sendMetricsToPushGateway(metrics []byte) {
-	req, err := http.NewRequest("POST", p.getPushGatewayURL(), bytes.NewBuffer(metrics))
+	req, err := http.NewRequest(
+		http.MethodPost,
+		p.getPushGatewayURL(),
+		bytes.NewBuffer(metrics),
+	)
 	if err != nil {
 		log.Println(err)
 		return
@@ -281,8 +303,10 @@ func (p *Prometheus) HandlerFunc() gin.HandlerFunc {
 			}
 			url = u.(string)
 		}
-		p.reqDur.WithLabelValues(p.serviceName, status, c.Request.Method, url).Add(elapsed)
-		p.reqCnt.WithLabelValues(p.serviceName, status, c.Request.Method, url).Inc()
+		p.reqDur.WithLabelValues(p.serviceName, status, c.Request.Method, url).
+			Add(elapsed)
+		p.reqCnt.WithLabelValues(p.serviceName, status, c.Request.Method, url).
+			Inc()
 		p.reqSz.Observe(float64(reqSz))
 		p.respSz.Observe(respSz)
 	}
@@ -295,7 +319,8 @@ func prometheusHandler() gin.HandlerFunc {
 	}
 }
 
-// From https://github.com/DanielHeckrath/gin-prometheus/blob/master/gin_prometheus.go
+// From
+// https://github.com/DanielHeckrath/gin-prometheus/blob/master/gin_prometheus.go
 func computeApproximateRequestSize(r *http.Request) int {
 	s := 0
 	if r.URL != nil {
